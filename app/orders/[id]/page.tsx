@@ -11,7 +11,6 @@ import { Formik, Form, Field, ErrorMessage } from "formik";
 import arrowLeft from "@/assets/svgs/arrow-left.svg";
 import status from "@/assets/svgs/status.svg";
 import Image from "next/image";
-import { AddProductSchema } from "@/utils/schema";
 import Table, { Column } from "@/components/Table/Table";
 import { ChevronDown, Link, MapPin } from "lucide-react";
 import { getTrackingSteps } from "@/utils/utils";
@@ -21,6 +20,8 @@ import authImg from "@/assets/images/IFETO-Logo-1.png";
 import { useState } from "react";
 import { AssignVendorModal } from "@/components/orders/AssignVendorModal";
 import { UpdateOrderTrackingModal } from "@/components/orders/UpdateOrderTrackingModal";
+import { SuccessModal } from "@/components/orders/SuccessModal";
+import tickCircleGreen from "@/assets/svgs/tick-circle-green.svg";
 
 type Order = {
   id: string; // Order ID
@@ -132,6 +133,7 @@ export default function Page() {
   const [openAssignModal, setOpenAssignModal] = useState(false);
   const [openUpdateOrderTrackingModal, setUpdateOrderTrackingModal] =
     useState(false);
+  const [successOpen, setSuccessOpen] = useState(false);
 
   return (
     <div className="bg-[#FAFAFA] space-y-6 min-h-screen h-full flex flex-col">
@@ -310,10 +312,57 @@ export default function Page() {
         </div>
       </div>
 
+      <div className="bg-white rounded-2xl lg:p-6 p-4 shadow-custom2 font-nunito space-y-6">
+        <h2 className="text-[18px] leading-7 md:text-[24px] md:leading-8 text-[#2A2A2A] font-semibold ">
+          Assignment
+        </h2>
+
+        <div className="grid md:grid-cols-2 grid-cols-1 gap-4">
+          <div className="w-full space-y-2">
+            <p className="text-[14px] leading-5 text-[#787878]">Assigned To</p>
+            <h1 className="text-[16px] leading-6 text-[#2A2A2A] font-semibold">
+              Halimah Enterprise
+            </h1>
+          </div>
+
+          <div className="w-full space-y-2">
+            <p className="text-[14px] leading-5 text-[#787878]">Assigned By</p>
+            <h1 className="text-[16px] leading-6 text-[#2A2A2A] font-semibold">
+              Elizabeth
+            </h1>
+          </div>
+
+          <div className="w-full space-y-2">
+            <p className="text-[14px] leading-5 text-[#787878]">
+              Date Assigned
+            </p>
+            <h1 className="text-[16px] leading-6 text-[#2A2A2A] font-semibold">
+              Apr 5, 2026 | 02:00PM
+            </h1>
+          </div>
+
+          <div className="w-full space-y-2">
+            <p className="text-[14px] leading-5 text-[#787878]">Last Updated</p>
+            <h1 className="text-[16px] leading-6 text-[#2A2A2A] font-semibold">
+              Apr 5, 2026 | 03:10PM
+            </h1>
+          </div>
+        </div>
+      </div>
+
       <AssignVendorModal open={openAssignModal} setOpen={setOpenAssignModal} />
       <UpdateOrderTrackingModal
         open={openUpdateOrderTrackingModal}
         setOpen={setUpdateOrderTrackingModal}
+        setSuccessOpen={setSuccessOpen}
+      />
+
+      <SuccessModal
+        open={successOpen}
+        onClose={() => setSuccessOpen(false)}
+        title="Success"
+        message="This order has been successfully updated"
+        icon={tickCircleGreen}
       />
     </div>
   );
