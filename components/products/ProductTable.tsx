@@ -10,13 +10,17 @@ import {
 } from "@/components/ui/select";
 import { ItemsPerPage } from "../Table/ItemsPerPage";
 import Table, { Column } from "../Table/Table";
-import Pagination from "../general/Pagination";
 import Link from "next/link";
 import Image from "next/image";
 import eyeGreen from "@/assets/svgs/eye-green.svg";
 import dangerOrange from "@/assets/svgs/danger-orange.svg";
+import Pagination from "../general/Pagination";
+import authImg from "@/assets/images/IFETO-Logo-1.png";
+import RightDrawer from "../general/RightDrawer";
+import { useState } from "react";
+import ViewProduct, { ProductDetailsDrawer } from "./ProductDetailsDrawer";
 
-type OrderStatus =
+type productstatus =
   | "placed"
   | "processing"
   | "shipped"
@@ -31,18 +35,22 @@ type Order = {
     name: string;
     assigned: boolean;
   };
-  status: OrderStatus;
+  status: productstatus;
   payout: "Eligible" | "-";
 };
 
-type OrdersTableProps = {
-  orders: Order[];
+type ProductTableProps = {
+  products: Order[];
   isLoading: boolean;
 };
 
-export default function OrdersTable({ orders, isLoading }: OrdersTableProps) {
+export default function ProductTable({
+  products,
+  isLoading,
+}: ProductTableProps) {
   const searchParams = useSearchParams();
   const perPage = Number(searchParams.get("perPage") ?? 7);
+  const [openViewProduct, setViewProduct] = useState(false);
 
   const statusMap = {
     pending: (
@@ -77,14 +85,33 @@ export default function OrdersTable({ orders, isLoading }: OrdersTableProps) {
   };
 
   const columns: Column<Order>[] = [
-    { header: "Order ID", accessor: "id" },
-    { header: "Customer", accessor: "customer" },
     {
-      header: "Amount",
+      header: "Product Name",
+      render: (row) => (
+        <div className="flex items-center gap-4">
+          <div className="w-[52px] h-[48px] rounded-[6px] bg-[#EFEEEE] flex items-center justify-center">
+            <Image
+              src={authImg}
+              alt={row.vendor.name}
+              width={51}
+              height={43}
+              className="object-contain"
+            />
+          </div>
+
+          <p className="text-[14px] leading-5 font-medium text-[#787878]">
+            {row.vendor.name}
+          </p>
+        </div>
+      ),
+    },
+    { header: "Vendor Name", accessor: "customer" },
+    {
+      header: "Category",
       render: (row) => `₦${row.amount?.toLocaleString()}.00`,
     },
     {
-      header: "Assigned Vendor",
+      header: "Inventory",
       render: (row) =>
         row.vendor?.assigned ? (
           <span className="flex items-center gap-2 text-gray-700">
@@ -106,17 +133,16 @@ export default function OrdersTable({ orders, isLoading }: OrdersTableProps) {
         </span>
       ),
     },
-    { header: "Payout", accessor: "payout" },
     {
       header: "Actions",
       render: (row) => (
-        <Link
-          href={`/orders/${row.name}`}
+        <div
+          onClick={() => setViewProduct(true)}
           className="flex items-center gap-2.5 text-[14px] leading-5 font-semibold text-[#27AE60] cursor-pointer"
         >
           <Image src={eyeGreen} alt="eye-icon" />
           <p>View</p>
-        </Link>
+        </div>
       ),
     },
   ];
@@ -127,7 +153,7 @@ export default function OrdersTable({ orders, isLoading }: OrdersTableProps) {
       <div className="flex-1">
         <Table
           columns={columns}
-          data={orders}
+          data={products}
           isLoading={isLoading}
           loadingRows={10}
         />
@@ -142,6 +168,14 @@ export default function OrdersTable({ orders, isLoading }: OrdersTableProps) {
         <ItemsPerPage />
         <Pagination totalItems={90} perPage={perPage} />
       </div>
+
+      <RightDrawer
+        isOpen={openViewProduct}
+        onClose={() => setViewProduct(false)}
+        widthClass="w-full md:w-[640px]"
+      >
+        <ProductDetailsDrawer onClose={() => setViewProduct(false)} />
+      </RightDrawer>
     </div>
   );
 }

@@ -10,13 +10,16 @@ import {
 } from "@/components/ui/select";
 import { ItemsPerPage } from "../Table/ItemsPerPage";
 import Table, { Column } from "../Table/Table";
-import Pagination from "../general/Pagination";
 import Link from "next/link";
 import Image from "next/image";
 import eyeGreen from "@/assets/svgs/eye-green.svg";
 import dangerOrange from "@/assets/svgs/danger-orange.svg";
+import Pagination from "../general/Pagination";
+import authImg from "@/assets/images/IFETO-Logo-1.png";
+import RightDrawer from "../general/RightDrawer";
+import { useState } from "react";
 
-type OrderStatus =
+type orderstatus =
   | "placed"
   | "processing"
   | "shipped"
@@ -31,18 +34,22 @@ type Order = {
     name: string;
     assigned: boolean;
   };
-  status: OrderStatus;
+  status: orderstatus;
   payout: "Eligible" | "-";
 };
 
-type OrdersTableProps = {
+type VendorManagementTableProps = {
   orders: Order[];
   isLoading: boolean;
 };
 
-export default function OrdersTable({ orders, isLoading }: OrdersTableProps) {
+export default function VendorManagementTable({
+  orders,
+  isLoading,
+}: VendorManagementTableProps) {
   const searchParams = useSearchParams();
   const perPage = Number(searchParams.get("perPage") ?? 7);
+  const [openViewProduct, setViewProduct] = useState(false);
 
   const statusMap = {
     pending: (
@@ -77,26 +84,17 @@ export default function OrdersTable({ orders, isLoading }: OrdersTableProps) {
   };
 
   const columns: Column<Order>[] = [
-    { header: "Order ID", accessor: "id" },
-    { header: "Customer", accessor: "customer" },
     {
-      header: "Amount",
-      render: (row) => `₦${row.amount?.toLocaleString()}.00`,
+      header: "Vendor Name",
+      accessor: "customer",
     },
     {
-      header: "Assigned Vendor",
-      render: (row) =>
-        row.vendor?.assigned ? (
-          <span className="flex items-center gap-2 text-gray-700">
-            <span className="w-2 h-2 bg-green-500 rounded-full" />
-            {row.vendor.name}
-          </span>
-        ) : (
-          <div className="text-[#F59E0B] flex items-center gap-[6px]">
-            <Image src={dangerOrange} alt="dangericon" />{" "}
-            <span>Unassigned</span>
-          </div>
-        ),
+      header: "Email",
+      accessor: "customer",
+    },
+    {
+      header: "Phone Number",
+      accessor: "customer",
     },
     {
       header: "Status",
@@ -106,12 +104,11 @@ export default function OrdersTable({ orders, isLoading }: OrdersTableProps) {
         </span>
       ),
     },
-    { header: "Payout", accessor: "payout" },
     {
       header: "Actions",
       render: (row) => (
         <Link
-          href={`/orders/${row.name}`}
+          href={`/vendor-management/${row.name}`}
           className="flex items-center gap-2.5 text-[14px] leading-5 font-semibold text-[#27AE60] cursor-pointer"
         >
           <Image src={eyeGreen} alt="eye-icon" />
@@ -142,6 +139,14 @@ export default function OrdersTable({ orders, isLoading }: OrdersTableProps) {
         <ItemsPerPage />
         <Pagination totalItems={90} perPage={perPage} />
       </div>
+
+      {/* <RightDrawer
+        isOpen={openViewProduct}
+        onClose={() => setViewProduct(false)}
+        widthClass="w-full md:w-[640px]"
+      >
+        <ProductDetailsDrawer onClose={() => setViewProduct(false)} />
+      </RightDrawer> */}
     </div>
   );
 }
