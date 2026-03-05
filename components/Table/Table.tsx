@@ -5,7 +5,7 @@ import SkeletonRow from "../loaders/SkeletonRow";
 import SkeletonHeader from "../loaders/SkeletonHeader";
 
 export type Column<T> = {
-  header: string;
+  header: React.ReactNode | (() => React.ReactNode);
   accessor?: keyof T;
   render?: (row: T) => React.ReactNode;
 };
@@ -38,7 +38,9 @@ export default function Table<T>({
             style={{ gridTemplateColumns: `repeat(${columns.length}, 1fr)` }}
           >
             {columns.map((col, index) => (
-              <p key={index}>{col.header}</p>
+              <div key={index}>
+                {typeof col.header === "function" ? col.header() : col.header}
+              </div>
             ))}
           </div>
         )}

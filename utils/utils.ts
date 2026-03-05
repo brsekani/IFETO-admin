@@ -86,3 +86,19 @@ export const formatNumberWithCommas = (value: string) => {
 
   return parts.join(".");
 };
+
+export const formatPriceKeepSymbol = (price: string) => {
+  if (!price) return "";
+
+  const symbol = price.charAt(0); // ₦ | $ | £
+  const amount = Number(price.slice(1));
+
+  if (isNaN(amount)) return price;
+
+  const formattedAmount = amount.toLocaleString(undefined, {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
+
+  return `${symbol}${formattedAmount}`;
+};
