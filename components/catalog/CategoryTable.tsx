@@ -206,13 +206,16 @@ export default function CategoryTable({
         onClose={() => setViewProduct(false)}
         widthClass="w-full md:w-[640px]"
       >
-        <ProductDetailsDrawer onClose={() => setViewProduct(false)} />
+        <ProductDetailsDrawer
+          onClose={() => setViewProduct(false)}
+          product={null}
+        />
       </RightDrawer>
 
       <DeleteCategoryDialog
         open={openDeleteCategoryDialog}
         onOpenChange={setOpenDeleteCategoryDialog}
-        id={selectedId}
+        id={selectedId || ""}
         onDelete={() => {
           console.log("Deleted!");
           setOpenDeleteCategoryDialog(false);
