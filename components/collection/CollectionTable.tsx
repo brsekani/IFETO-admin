@@ -77,9 +77,9 @@ export default function CollectionTable({
   };
 
   const statusMap = {
-    pending: (
+    placed: (
       <span className="px-4 py-1 text-[14px] font-medium capitalize rounded-full bg-[#F59E0B1A] text-[#F59E0B]">
-        Pending
+        Placed
       </span>
     ),
 
@@ -95,9 +95,9 @@ export default function CollectionTable({
       </span>
     ),
 
-    paid: (
+    completed: (
       <span className="px-4 py-1 text-[14px] font-medium capitalize rounded-full bg-[#34C7591A] text-[#34C759]">
-        Paid
+        Completed
       </span>
     ),
 
@@ -220,13 +220,16 @@ export default function CollectionTable({
         onClose={() => setViewProduct(false)}
         widthClass="w-full md:w-[640px]"
       >
-        <ProductDetailsDrawer onClose={() => setViewProduct(false)} />
+        <ProductDetailsDrawer
+          onClose={() => setViewProduct(false)}
+          product={null}
+        />
       </RightDrawer>
 
       <DeleteCollectionDialog
         open={openDeleteCollectionDialog}
         onOpenChange={setOpenDeleteCollectionDialog}
-        id={selectedId}
+        id={selectedId || ""}
         onDelete={() => {
           console.log("Deleted!");
           setOpenDeleteCollectionDialog(false);

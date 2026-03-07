@@ -7,8 +7,9 @@ import authBg from "@/assets/images/authImg.png";
 import useResetPassword from "@/hooks/form-hooks/useResetPassword";
 import ResetPasswordSuccess from "@/components/auth/ResetPasswordSuccess";
 import { useRouter } from "next/navigation";
+import { Suspense } from "react";
 
-const Page = () => {
+const ResetPasswordContent = () => {
   const router = useRouter();
   const {
     formik,
@@ -68,6 +69,20 @@ const Page = () => {
         </div>
       </div>
     </div>
+  );
+};
+
+const Page = () => {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center">
+          Loading...
+        </div>
+      }
+    >
+      <ResetPasswordContent />
+    </Suspense>
   );
 };
 
