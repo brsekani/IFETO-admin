@@ -74,6 +74,28 @@ export interface GetAdminOrdersResponse {
   statusCode: number;
 }
 
+export interface GetAdminOrderStatsParams {
+  startDate?: string;
+  endDate?: string;
+  vendorId?: string;
+  customerId?: string;
+}
+
+export interface GetAdminOrderStatsResponse {
+  success: boolean;
+  message: string;
+  data: {
+    total: number;
+    pending: number;
+    processing: number;
+    intransit: number;
+    delivered: number;
+    canceled: number;
+    unassigned: number;
+  };
+  statusCode: number;
+}
+
 export const ordersApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     getAdminOrders: builder.query<GetAdminOrdersResponse, GetAdminOrdersParams>(
@@ -105,7 +127,50 @@ export const ordersApi = apiSlice.injectEndpoints({
       }),
       invalidatesTags: ["Orders"],
     }),
+    getAdminOrder: builder.query<
+      { success: boolean; message: string; data: Order; statusCode: number },
+      string
+    >({
+      query: (id) => `/admin/orders/${id}`,
+      providesTags: (result, error, id) => [{ type: "Orders", id }],
+    }),
+    updateOrderStatus: builder.mutation<
+      { success: boolean; message: string },
+      { id: string; status: string; comment?: string }
+    >({
+      query: ({ id, status, comment }) => ({
+        url: `/admin/orders/${id}/status`,
+        method: "PATCH",
+        body: { status, comment },
+      }),
+      invalidatesTags: ["Orders"],
+    }),
+    getAdminOrderStats: builder.query<
+      GetAdminOrderStatsResponse,
+      GetAdminOrderStatsParams | void
+    >({
+      query: (params) => {
+        let url = "/admin/orders/stats";
+        if (params) {
+          const qs = new URLSearchParams();
+          if (params.startDate) qs.set("startDate", params.startDate);
+          if (params.endDate) qs.set("endDate", params.endDate);
+          if (params.vendorId) qs.set("vendorId", params.vendorId);
+          if (params.customerId) qs.set("customerId", params.customerId);
+          const queryString = qs.toString();
+          if (queryString) url += `?${queryString}`;
+        }
+        return url;
+      },
+      providesTags: ["Orders"] as any,
+    }),
   }),
 });
 
-export const { useGetAdminOrdersQuery, useRouteOrderMutation } = ordersApi;
+export const {
+  useGetAdminOrdersQuery,
+  useGetAdminOrderQuery,
+  useRouteOrderMutation,
+  useGetAdminOrderStatsQuery,
+  useUpdateOrderStatusMutation,
+} = ordersApi;

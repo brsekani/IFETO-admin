@@ -30,7 +30,10 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import EmptyState from "@/components/general/EmptyState";
 import OrdersTable from "@/components/dashboard/OrdersTable";
 import { DatePickerWithRange } from "@/components/general/DatePickerWithRange";
-import { useGetAdminOrdersQuery } from "@/lib/features/orders/ordersApi";
+import {
+  useGetAdminOrdersQuery,
+  useGetAdminOrderStatsQuery,
+} from "@/lib/features/orders/ordersApi";
 
 export default function Page() {
   const searchParams = useSearchParams();
@@ -80,6 +83,10 @@ export default function Page() {
 
   const orders = ordersResponse?.data?.orders || [];
   const totalItems = ordersResponse?.data?.meta?.total || 0;
+
+  const { data: statsResponse, isLoading: isStatsLoading } =
+    useGetAdminOrderStatsQuery();
+  const stats = statsResponse?.data;
 
   const filterOptions = [
     "All orders",
@@ -151,7 +158,7 @@ export default function Page() {
         <div className="w-full grid xl:grid-cols-4 grid-cols-2 gap-4">
           <MerticsCard
             title="Total Orders"
-            value={totalItems}
+            value={stats?.total ?? 0}
             description="All orders you’ve had"
             icon={
               <Image
@@ -161,11 +168,12 @@ export default function Page() {
               />
             }
             iconBg={"#2E0BF51A"}
+            isLoading={isStatsLoading}
           />
           <MerticsCard
-            title="Total Weight Processed"
-            value={0}
-            description="Across all orders"
+            title="Processing Orders"
+            value={stats?.processing ?? 0}
+            description="Currently processing"
             icon={
               <Image
                 src={greenTruck}
@@ -174,24 +182,27 @@ export default function Page() {
               />
             }
             iconBg={"#E3FFEF"}
+            isLoading={isStatsLoading}
           />
           <MerticsCard
-            title="Total Earnings"
-            value={0}
-            description="In your local currency"
+            title="Delivered Orders"
+            value={stats?.delivered ?? 0}
+            description="Successfully delivered"
             icon={
               <Image src={walletAdd} alt="" className="w-4 h-4 md:w-6 md:h-6" />
             }
             iconBg={"#9333EA1A"}
+            isLoading={isStatsLoading}
           />
           <MerticsCard
             title="Pending Orders"
-            value={0}
+            value={stats?.pending ?? 0}
             description="Action required"
             icon={
               <Image src={clock} alt="" className="w-4 h-4 md:w-6 md:h-6" />
             }
             iconBg={"#F59E0B1A"}
+            isLoading={isStatsLoading}
           />
         </div>
       </div>

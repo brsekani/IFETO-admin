@@ -23,18 +23,17 @@ import { UpdateOrderTrackingModal } from "@/components/orders/UpdateOrderTrackin
 import { SuccessModal } from "@/components/orders/SuccessModal";
 import tickCircleGreen from "@/assets/svgs/tick-circle-green.svg";
 
-import { useParams } from "next/navigation";
-import { useGetAdminOrdersQuery } from "@/lib/features/orders/ordersApi";
+import { useParams, useRouter } from "next/navigation";
+import { useGetAdminOrderQuery } from "@/lib/features/orders/ordersApi";
 
 export default function Page() {
   const params = useParams();
   const id = params.id as string;
+  const router = useRouter();
 
-  const { data: response, isLoading } = useGetAdminOrdersQuery({
-    limit: 100, // Fetch a large batch to ensure the order is found locally, since no direct single endpoint exists.
-  });
+  const { data: response, isLoading } = useGetAdminOrderQuery(id);
 
-  const order = response?.data?.orders?.find((o) => o.id === id);
+  const order = response?.data;
 
   const [openAssignModal, setOpenAssignModal] = useState(false);
   const [openUpdateOrderTrackingModal, setUpdateOrderTrackingModal] =
@@ -63,12 +62,15 @@ export default function Page() {
     <div className="bg-[#FAFAFA] space-y-6 min-h-screen h-full flex flex-col">
       <div className="flex flex-row gap-2 md:py-6 py-3 md:px-8 px-6 shadow-custom2 items-center justify-between">
         <div className="flex flex-col gap-2">
-          <div className="flex items-center gap-2">
+          <button
+            className="flex items-center gap-2 cursor-pointer"
+            onClick={() => router.back()}
+          >
             <Image src={arrowLeft} alt="arrow-back" />
             <p className="text-[16px] leading-6 font-semibold text-[#787878]">
               back
             </p>
-          </div>
+          </button>
 
           <h1 className="md:text-[24px] text-[16px] md:leading-8 leading-6 text-[#5A5A5A] font-semibold md:w-full md:text-start w-full text-center">
             Order Details
@@ -111,7 +113,9 @@ export default function Page() {
           "
               onClick={() => setOpenAssignModal(true)}
             >
-              Assign Vendor
+              {order.assignments && order.assignments.length > 0
+                ? "Reassign Vendor"
+                : "Assign Vendor"}
             </DropdownMenuItem>
 
             <DropdownMenuItem
@@ -311,6 +315,8 @@ export default function Page() {
         open={openUpdateOrderTrackingModal}
         setOpen={setUpdateOrderTrackingModal}
         setSuccessOpen={setSuccessOpen}
+        orderId={id}
+        customerEmail={order.user?.email || "N/A"}
       />
 
       <SuccessModal

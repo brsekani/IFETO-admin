@@ -1,8 +1,10 @@
 "use client";
 
-import { X } from "lucide-react";
+import { X, Loader2 } from "lucide-react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
+import { useUpdateOrderStatusMutation } from "@/lib/features/orders/ordersApi";
+import { toast } from "sonner";
 
 import {
   Select,
@@ -16,25 +18,42 @@ export function UpdateOrderTrackingModal({
   open,
   setOpen,
   setSuccessOpen,
+  orderId,
+  customerEmail,
 }: {
   open: boolean;
   setOpen: (value: boolean) => void;
   setSuccessOpen: (value: boolean) => void;
+  orderId: string;
+  customerEmail: string;
 }) {
+  const [updateOrderStatus, { isLoading: isUpdating }] =
+    useUpdateOrderStatusMutation();
   const formik = useFormik({
     initialValues: {
-      email: "Gabriel.isaac@example.com",
+      email: customerEmail,
       status: "",
       comment: "",
     },
+    enableReinitialize: true,
     validationSchema: Yup.object({
       status: Yup.string().required("Order status is required"),
       comment: Yup.string().required("Comment is required"),
     }),
-    onSubmit: (values) => {
-      console.log("Update Tracking Payload:", values);
-      setOpen(false);
-      setSuccessOpen(true);
+    onSubmit: async (values) => {
+      try {
+        await updateOrderStatus({
+          id: orderId,
+          status: values.status,
+          comment: values.comment,
+        }).unwrap();
+
+        setOpen(false);
+        setSuccessOpen(true);
+        formik.resetForm();
+      } catch (error: any) {
+        toast.error(error?.data?.message || "Failed to update order tracking");
+      }
     },
   });
 
@@ -91,7 +110,7 @@ export function UpdateOrderTrackingModal({
                   }
                 >
                   <SelectTrigger
-                    className={`!h-[50px] rounded-[8px] w-full ${
+                    className={`h-[50px]! rounded-[8px] w-full ${
                       formik.touched.status && formik.errors.status
                         ? "border-red-500"
                         : ""
@@ -101,11 +120,11 @@ export function UpdateOrderTrackingModal({
                   </SelectTrigger>
 
                   <SelectContent>
-                    <SelectItem value="placed">Placed</SelectItem>
-                    <SelectItem value="processing">Processing</SelectItem>
-                    <SelectItem value="shipped">Shipped</SelectItem>
-                    <SelectItem value="completed">Completed</SelectItem>
-                    <SelectItem value="cancelled">Cancelled</SelectItem>
+                    <SelectItem value="PENDING">Pending</SelectItem>
+                    <SelectItem value="PROCESSING">Processing</SelectItem>
+                    <SelectItem value="SHIPPED">Shipped</SelectItem>
+                    <SelectItem value="DELIVERED">Delivered</SelectItem>
+                    <SelectItem value="CANCELED">Canceled</SelectItem>
                   </SelectContent>
                 </Select>
 
@@ -153,13 +172,14 @@ export function UpdateOrderTrackingModal({
 
               <button
                 type="submit"
-                disabled={!formik.isValid}
-                className={`flex-1 rounded-[8px] h-[48px] text-[18px] font-semibold ${
-                  formik.isValid
+                disabled={!formik.isValid || isUpdating}
+                className={`flex-1 flex items-center justify-center gap-2 rounded-[8px] h-[48px] text-[18px] font-semibold ${
+                  formik.isValid && !isUpdating
                     ? "bg-[#27AE60] hover:bg-[#219150] text-white"
                     : "bg-gray-300 text-gray-500 cursor-not-allowed"
                 }`}
               >
+                {isUpdating && <Loader2 className="w-5 h-5 animate-spin" />}
                 Submit
               </button>
             </div>
