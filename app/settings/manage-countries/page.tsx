@@ -30,6 +30,11 @@ import {
 } from "@/components/ui/select";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import search from "@/assets/svgs/search-normal-light.svg";
+import EmptyState from "@/components/general/EmptyState";
+import emptyIcon from "@/assets/svgs/empty-State-country.svg";
+import OrdersTable from "@/components/dashboard/OrdersTable";
+import CountryTable from "@/components/settings/ManangeCountry/CountryTable";
+import { CreateCountryDialog } from "@/components/settings/ManangeCountry/CreateCountryDialog";
 
 type Order = {
   id: string; // Order ID
@@ -160,9 +165,7 @@ export default function Page() {
     },
   ];
 
-  const [openAssignModal, setOpenAssignModal] = useState(false);
-  const [openUpdateOrderTrackingModal, setUpdateOrderTrackingModal] =
-    useState(false);
+  const [openCreateCountry, setOpenCreateCountry] = useState(false);
   const [successOpen, setSuccessOpen] = useState(false);
 
   return (
@@ -177,19 +180,19 @@ export default function Page() {
           </div>
 
           <h1 className="md:text-[24px] text-[16px] md:leading-8 leading-6 text-[#5A5A5A] font-semibold md:w-full md:text-start w-full text-center">
-            Order Details
+            Manage Countries
           </h1>
         </div>
         <div
           className="px-5 py-2.5 bg-[#27AE60] rounded-md text-white font-semibold hidden md:flex items-center gap-2 cursor-pointer"
-          //   onClick={() => setCreateCategory(true)}
+          onClick={() => setOpenCreateCountry(true)}
         >
           <Image src={add} alt="add-icon" />
           Add Country
         </div>
       </div>
 
-      <div className="grid grid-cols-4 gap-4">
+      <div className="grid grid-cols-1  md:grid-cols-4 gap-4">
         <MerticsCard
           title="Total Countries"
           value={0}
@@ -270,12 +273,25 @@ export default function Page() {
         </div>
       </div>
 
-      <AssignVendorModal open={openAssignModal} setOpen={setOpenAssignModal} />
-      <UpdateOrderTrackingModal
-        open={openUpdateOrderTrackingModal}
-        setOpen={setUpdateOrderTrackingModal}
-        setSuccessOpen={setSuccessOpen}
-      />
+      <div className="flex-1 flex w-full">
+        {orders.length === 0 ? (
+          <div className="flex-1 flex items-center justify-center">
+            <EmptyState
+              icon={emptyIcon}
+              title="No country yet"
+              description="You haven’t added any country."
+            />
+          </div>
+        ) : (
+          <div className="w-full">
+            <CountryTable
+              countries={orders}
+              isLoading={false}
+              totalItems={orders.length}
+            />
+          </div>
+        )}
+      </div>
 
       <SuccessModal
         open={successOpen}
@@ -283,6 +299,15 @@ export default function Page() {
         title="Success"
         message="This order has been successfully updated"
         icon={tickCircleGreen}
+      />
+
+      <CreateCountryDialog
+        open={openCreateCountry}
+        onOpenChange={setOpenCreateCountry}
+        onCreate={() => {
+          console.log("Deleted!");
+          setOpenCreateCountry(false);
+        }}
       />
     </div>
   );
