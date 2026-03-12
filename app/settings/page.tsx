@@ -34,7 +34,10 @@ import OrdersTable from "@/components/dashboard/OrdersTable";
 import { DatePickerWithRange } from "@/components/general/DatePickerWithRange";
 import ProductTable from "@/components/products/ProductTable";
 import { ChartColumnBig, Handbag } from "lucide-react";
-import CurrencyExchangeRate from "@/components/settings/CurrencyExchangeRate";
+import CurrencyExchangeRate from "@/components/settings/CurrencyExchangeRate/CurrencyExchangeRate";
+import ShippingConfiguration from "@/components/settings/ShippingConfiguration/ShippingConfiguration";
+import PlatformEconomics from "@/components/settings/PlatformEconomics/PlatformEconomics";
+import SystemSettings from "@/components/settings/SystemSettings/SystemSettings";
 
 export default function Page() {
   const searchParams = useSearchParams();
@@ -150,12 +153,13 @@ export default function Page() {
         </div>
       </div>
 
-      <div className="flex md:items-center items-start md:flex-row flex-col justify-between gap-4">
+      <div className="flex md:items-center items-start md:flex-row flex-col justify-between gap-4 w-full">
         <Tabs
           selectedIndex={filterOptions.findIndex(
             (option) => option.state === activeFilter,
           )}
           onSelect={(index) => setActiveFilter(filterOptions[index].state)}
+          className="w-full"
         >
           {/* TAB BUTTONS */}
           <TabList className="flex gap-4 mt-6 overflow-x-auto pb-2">
@@ -186,20 +190,16 @@ export default function Page() {
 
           {/* TAB CONTENT */}
           {filterOptions.map((option) => (
-            <TabPanel key={option.state}>
-              <div className="mt-6">
+            <TabPanel key={option.state} className={"w-full"}>
+              <div className="mt-6 w-full">
                 {option.state === "currency-exchange-rate" && (
                   <CurrencyExchangeRate />
                 )}
                 {option.state === "shipping-configuration" && (
-                  <h1>Products Content</h1>
+                  <ShippingConfiguration />
                 )}
-                {option.state === "platform-economics" && (
-                  <h1>Products Content</h1>
-                )}
-                {option.state === "system-settings" && (
-                  <h1>Products Content</h1>
-                )}
+                {option.state === "platform-economics" && <PlatformEconomics />}
+                {option.state === "system-settings" && <SystemSettings />}
               </div>
             </TabPanel>
           ))}
